@@ -12,7 +12,6 @@ The current autoplot.jar file is kept in $HOME/autoplot_data/autoplot.jar
 Log files of the stdout and stderr streams are stored in $HOME/autoplot_data/log
 
 ## Prerequisites
-This is a bash script, so `bash` is required...
 `wget` is required for downloading version info and jar files.
 
 ## Installation
