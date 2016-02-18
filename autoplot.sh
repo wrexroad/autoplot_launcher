@@ -69,15 +69,15 @@ done
 #use whatever java shows up first in $PATH 
 echo "Starting Autoplot..."
 
-if [ "$APDEBUG" == "1" ]; then 
-   if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then      
+if [ "$APDEBUG" == "1" ]; then
+   if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
       echo $EXEC "${JAVA_HOME}"/bin/java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
    else
       echo $EXEC /usr/bin/env java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
    fi
 fi
 
-if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then      
+if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
       $EXEC "${JAVA_HOME}"/bin/java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}" >$AP_HOME/log/out.txt 2>$AP_HOME/log/err.txt &
 else
       $EXEC /usr/bin/env java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}" >$AP_HOME/log/out.txt 2>$AP_HOME/log/err.txt &
