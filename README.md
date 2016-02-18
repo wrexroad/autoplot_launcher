@@ -18,6 +18,7 @@ Log files of the stdout and stderr streams are stored in $HOME/autoplot_data/log
 ```
 #in your home direcotry
 $ git clone https://github.com/wrexroad/autoplot_launcher.git
+$ chmod +x $HOME/autplot_launcher/autoplot.sh
 $ sudo ln -s $HOME/autplot_launcher/autoplot.sh /bin/usr/autoplot
 ```
 
