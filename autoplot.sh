@@ -1,13 +1,30 @@
 #!/bin/bash
 
 #make sure there is a valid place to keep autoplot and log info
-AUTOPLOT_HOME=$HOME/autoplot_data
-JARFILE=$AUTOPLOT_HOME/autoplot.jar;
-mkdir -p $AUTOPLOT_HOME/log
+AP_HOME=$HOME/autoplot_data
+AP_LIB=$AP_HOME/lib
+AP_LOG=$AP_HOME/log
+mkdir -p $AP_LIB
+mkdir -p $AP_LOG
 
 echo "Checking for Autolplot update..."
-cd $AUTOPLOT_HOME
-wget -N http://autoplot.org/jnlp/latest/autoplot.jar
+cd $AP_LIB
+
+#download the webstart file which contains the version info
+wget -N http://autoplot.org/autoplot.jnlp
+
+#get the AutoplotStable version and main class path
+MAINCLASS=$(grep main-class ~/autoplot_data/lib/autoplot.jnlp | sed -e 's/.*main-class="\(.*\)".*/\1/')
+AP_STAB=$(grep -oh "AutoplotStable.[[:digit:]]\{8\}.jar" autoplot.jnlp)
+
+#get the AutoplotStable and AutoplotVolatile jars
+wget -N http://autoplot.org/jnlp/lib/$AP_STAB.pack.gz http://autoplot.org/jnlp/latest/AutoplotVolatile.jar.pack.gz
+
+#unpack the jars
+unpack200 -v $AP_STAB.pack.gz $AP_STAB
+echo ""
+unpack200 -v AutoplotVolatile.jar.pack.gz AutoplotVolatile.jar
+echo ""
 cd -
 
 #get any user supplied arguments
@@ -37,14 +54,14 @@ done
 #use whatever java shows up first in the PATH 
 if [ "$APDEBUG" == "1" ]; then 
    if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then      
-      echo $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
+      echo $EXEC "${JAVA_HOME}"/bin/java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
    else
-      echo $EXEC /usr/bin/env java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
+      echo $EXEC /usr/bin/env java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
    fi
 fi
 
 if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then      
-      $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}" >$AUTOPLOT_HOME/log/out.txt 2>$AUTOPLOT_HOME/log/err.txt &
+      $EXEC "${JAVA_HOME}"/bin/java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}" >$AP_HOME/log/out.txt 2>$AP_HOME/log/err.txt &
 else
-      $EXEC /usr/bin/env java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}" >$AUTOPLOT_HOME/log/out.txt 2>$AUTOPLOT_HOME/log/err.txt &
+      $EXEC /usr/bin/env java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}" >$AP_HOME/log/out.txt 2>$AP_HOME/log/err.txt &
 fi
