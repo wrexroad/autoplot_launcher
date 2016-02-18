@@ -7,24 +7,39 @@ AP_LOG=$AP_HOME/log
 mkdir -p $AP_LIB
 mkdir -p $AP_LOG
 
-echo "Checking for Autolplot update..."
 cd $AP_LIB
 
 #download the webstart file which contains the version info
+echo ""
+echo "Updating Autoplot Webstart file..."
+echo ""
 wget -N http://autoplot.org/autoplot.jnlp
+echo "---------------------------"
+echo ""
 
-#get the AutoplotStable version and main class path
+#get the AutoplotStable version and main class path from the webstart file
 MAINCLASS=$(grep main-class ~/autoplot_data/lib/autoplot.jnlp | sed -e 's/.*main-class="\(.*\)".*/\1/')
 AP_STAB=$(grep -oh "AutoplotStable.[[:digit:]]\{8\}.jar" autoplot.jnlp)
 
-#get the AutoplotStable and AutoplotVolatile jars
-wget -N http://autoplot.org/jnlp/lib/$AP_STAB.pack.gz http://autoplot.org/jnlp/latest/AutoplotVolatile.jar.pack.gz
-
-#unpack the jars
-unpack200 -v $AP_STAB.pack.gz $AP_STAB
+#only download and upack AutoplotStable if we dont have it already
+if [ -x $AP_STAB ]; then
+   echo "Updating AutolplotStable library..."
+   echo ""
+   wget -N http://autoplot.org/jnlp/lib/$AP_STAB.pack.gz 
+   unpack200 -v $AP_STAB.pack.gz $AP_STAB
+   echo "---------------------------"
+   echo ""
+fi
+  
+#since AutoplotVolatile does not have a version number in the name,
+#just try to redownload and unpack
+echo "Updating AutolplotVolatile library..."
 echo ""
+http://autoplot.org/jnlp/latest/AutoplotVolatile.jar.pack.gz
 unpack200 -v AutoplotVolatile.jar.pack.gz AutoplotVolatile.jar
+echo "---------------------------"
 echo ""
+
 cd -
 
 #get any user supplied arguments
@@ -51,7 +66,9 @@ for i in "$@"; do
 done
 
 #Try to run java as specified by $JAVA_HOME. If that variable isn't set, just
-#use whatever java shows up first in the PATH 
+#use whatever java shows up first in $PATH 
+echo "Starting Autoplot..."
+
 if [ "$APDEBUG" == "1" ]; then 
    if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then      
       echo $EXEC "${JAVA_HOME}"/bin/java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
@@ -65,3 +82,6 @@ if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
 else
       $EXEC /usr/bin/env java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}" >$AP_HOME/log/out.txt 2>$AP_HOME/log/err.txt &
 fi
+
+echo "Log files are being stored in $AP_LOG/out.txt and $AP_LOG/err.txt"
+ 
