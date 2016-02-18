@@ -22,7 +22,7 @@ MAINCLASS=$(grep main-class ~/autoplot_data/lib/autoplot.jnlp | sed -e 's/.*main
 AP_STAB=$(grep -oh "AutoplotStable.[[:digit:]]\{8\}.jar" autoplot.jnlp)
 
 #only download and upack AutoplotStable if we dont have it already
-if [ -x $AP_STAB ]; then
+if [ ! -f $AP_LIB/$AP_STAB ]; then
    echo "Updating AutolplotStable library..."
    echo ""
    wget -N http://autoplot.org/jnlp/lib/$AP_STAB.pack.gz 
@@ -35,7 +35,7 @@ fi
 #just try to redownload and unpack
 echo "Updating AutolplotVolatile library..."
 echo ""
-http://autoplot.org/jnlp/latest/AutoplotVolatile.jar.pack.gz
+wget -N http://autoplot.org/jnlp/latest/AutoplotVolatile.jar.pack.gz
 unpack200 -v AutoplotVolatile.jar.pack.gz AutoplotVolatile.jar
 echo "---------------------------"
 echo ""
