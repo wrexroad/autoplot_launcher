@@ -44,8 +44,19 @@ function getjars {
    if [ ! -f $AP_LIB/$AP_STAB ]; then
       echo "Updating AutolplotStable library..."
       echo ""
-      wget -N http://autoplot.org/jnlp/lib/$AP_STAB.pack.gz 
-      unpack200 -v $AP_STAB.pack.gz $AP_STAB
+      wget -N http://autoplot.org/jnlp/lib/$AP_STAB.pack.gz
+      if [ "$?" != "0" ]; then
+         echo "Failed to get http://autoplot.org/jnlp/lib/$AP_STAB.pack.gz"
+         echo "Quitting..."
+         exit
+      fi
+      
+      #We have to use gzip to decompress pack.gz file. Older versions of Java 
+      #seem to be incompatable with some versions of unpack200 compression
+      gzip -d $AP_STAB.pack.gz
+      unpack200 -v $AP_STAB.pack $AP_STAB
+      rm $AP_STAB.pack
+      
       echo "---------------------------"
       echo ""
    fi
@@ -61,10 +72,21 @@ function getjars {
    echo "Updating AutolplotVolatile library..."
    echo ""
    wget -N http://autoplot.org/jnlp/$AP_VER/AutoplotVolatile.jar.pack.gz
-   unpack200 -v AutoplotVolatile.jar.pack.gz AutoplotVolatile.jar
+   if [ "$?" != "0" ]; then
+      echo "Failed to get http://autoplot.org/jnlp/lib/AutoplotVolatile.jar.pack.gz"
+      echo "Quitting..."
+      exit
+   fi
+   
+   #copy save the jar to a versioned filename for future use
+   cp --preserve=timestamps AutoplotVolatile.jar.pack.gz AutoplotVolatile.$AP_VER.jar.pack.gz
+   
+   gzip -d AutoplotVolatile.jar.pack.gz
+   unpack200 -v AutoplotVolatile.jar.pack AutoplotVolatile.jar
+   rm AutoplotVolatile.jar.pack
+   
    echo "---------------------------"
    echo ""
-   cp --preserve=timestamps AutoplotVolatile.jar.pack.gz AutoplotVolatile.$AP_VER.jar.pack.gz
 }
 
 #get any user supplied arguments
