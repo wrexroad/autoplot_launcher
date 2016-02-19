@@ -91,7 +91,7 @@ done
 
 if [ "$APDEBUG" == "1" ]; then    
    for i in "$@"; do
-          echo "arg: \"$i\""
+          echo "[DEBUG] arg: \"$i\""
    done
 fi
 
@@ -110,9 +110,9 @@ echo "Starting Autoplot..."
 
 if [ "$APDEBUG" == "1" ]; then
    if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
-      echo $EXEC "${JAVA_HOME}"/bin/java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
+      echo "[DEBUG]" $EXEC "${JAVA_HOME}"/bin/java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
    else
-      echo $EXEC /usr/bin/env java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
+      echo "[DEBUG]" $EXEC /usr/bin/env java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
    fi
 fi
 
