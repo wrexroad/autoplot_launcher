@@ -8,6 +8,25 @@ AP_ARGS=""
 AP_VER="latest"
 memIsImplicit=1
 
+
+function printhelp {
+  echo "Autoplot Launcher rev160219"
+  echo
+  echo "usage: ./autoplot.sh [options]"
+  echo
+  echo "Options:"
+  echo "--version={version}       Request a specific version of Autoplot."
+  echo "                          Default is 'latest'."
+  echo "-J-{javaopts}             Options for the Java Virtual Machine should"
+  echo "                          be prefixed with '-J'."
+  echo "-h, --headless            Run Autoplot in headless mode."
+  echo "--debug                   Autoplot Launcher mode provides extra dialog"
+  echo "                          about what is happening in this script."
+  echo "--help                    Prints this dialog."
+  echo
+  exit
+}
+
 #get any user supplied arguments
 for i in "$@"; do
    if [[ $i == -J-Xmx* ]]; then
@@ -23,6 +42,8 @@ for i in "$@"; do
       AP_VER="${i:10}";
    elif [[ $i == "--debug" ]]; then
       APDEBUG=1;
+   elif [[ $i == "--help" ]]; then
+      printhelp;
    else
       AP_ARGS="${AP_ARGS} $i";
    fi
@@ -91,4 +112,3 @@ else
 fi
 
 echo "Log files are being stored in $AP_LOG/out.txt and $AP_LOG/err.txt"
- 
