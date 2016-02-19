@@ -110,16 +110,16 @@ echo "Starting Autoplot..."
 
 if [ "$APDEBUG" == "1" ]; then
    if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
-      echo "[DEBUG]" $EXEC "${JAVA_HOME}"/bin/java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
+      echo "[DEBUG]" $EXEC "${JAVA_HOME}"/bin/java -cp ${AP_LIB}/AutoplotVolatile.jar:$AP_LIB/$AP_STAB ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
    else
-      echo "[DEBUG]" $EXEC /usr/bin/env java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
+      echo "[DEBUG]" $EXEC /usr/bin/env java -cp ${AP_LIB}/AutoplotVolatile.jar:$AP_LIB/$AP_STAB ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}"
    fi
 fi
 
 if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
-      $EXEC "${JAVA_HOME}"/bin/java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}" >$AP_HOME/log/out.txt 2>$AP_HOME/log/err.txt &
+      $EXEC "${JAVA_HOME}"/bin/java -cp ${AP_LIB}/AutoplotVolatile.jar:$AP_LIB/$AP_STAB ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}" >$AP_HOME/log/out.txt 2>$AP_HOME/log/err.txt &
 else
-      $EXEC /usr/bin/env java -cp "${AP_LIB}/*" ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}" >$AP_HOME/log/out.txt 2>$AP_HOME/log/err.txt &
+      $EXEC /usr/bin/env java -cp ${AP_LIB}/AutoplotVolatile.jar:$AP_LIB/$AP_STAB ${JAVA_ARGS} $MAINCLASS "${AP_ARGS}" >$AP_HOME/log/out.txt 2>$AP_HOME/log/err.txt &
 fi
 
 echo "Log files are being stored in $AP_LOG/out.txt and $AP_LOG/err.txt"
