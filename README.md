@@ -14,6 +14,8 @@ Log files of the stdout and stderr streams are stored in $HOME/autoplot_data/log
 ## Prerequisites
 `wget` is required for downloading version info and jar files.
 
+`gzip` is needed to unpack older versions of Autoplot correctly.
+
 ## Installation
 ```
 #in your home direcotry
