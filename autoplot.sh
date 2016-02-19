@@ -8,23 +8,63 @@ AP_ARGS=""
 AP_VER="latest"
 memIsImplicit=1
 
-
 function printhelp {
-  echo "Autoplot Launcher rev160219"
-  echo
-  echo "usage: ./autoplot.sh [options]"
-  echo
-  echo "Options:"
-  echo "--version={version}       Request a specific version of Autoplot."
-  echo "                          Default is 'latest'."
-  echo "-J-{javaopts}             Options for the Java Virtual Machine should"
-  echo "                          be prefixed with '-J'."
-  echo "-h, --headless            Run Autoplot in headless mode."
-  echo "--debug                   Autoplot Launcher mode provides extra dialog"
-  echo "                          about what is happening in this script."
-  echo "--help                    Prints this dialog."
-  echo
-  exit
+   echo "Autoplot Launcher rev160219"
+   echo
+   echo "usage: ./autoplot.sh [options]"
+   echo
+   echo "Options:"
+   echo "--version={version}       Request a specific version of Autoplot."
+   echo "                          Default is 'latest'."
+   echo "-J-{javaopts}             Options for the Java Virtual Machine should"
+   echo "                          be prefixed with '-J'."
+   echo "-h, --headless            Run Autoplot in headless mode."
+   echo "--debug                   Autoplot Launcher mode provides extra dialog"
+   echo "                          about what is happening in this script."
+   echo "--help                    Prints this dialog."
+   echo
+   exit
+}
+
+function getjars {
+   #download the webstart file which contains the version info
+   echo ""
+   echo "Updating Autoplot Webstart file..."
+   echo ""
+   rm autoplot.jnlp
+   wget http://autoplot.org/jnlp/$AP_VER/autoplot.jnlp
+   echo "---------------------------"
+   echo ""
+   
+   #get the AutoplotStable version and main class path from the webstart file
+   MAINCLASS=$(grep main-class ~/autoplot_data/lib/autoplot.jnlp | sed -e    's/.*main-class="\(.*\)".*/\1/')
+   AP_STAB=$(grep -oh "AutoplotStable.[[:digit:]]\{8\}.jar" autoplot.jnlp)
+   
+   #only download and upack AutoplotStable if we dont have it already
+   if [ ! -f $AP_LIB/$AP_STAB ]; then
+      echo "Updating AutolplotStable library..."
+      echo ""
+      wget -N http://autoplot.org/jnlp/lib/$AP_STAB.pack.gz 
+      unpack200 -v $AP_STAB.pack.gz $AP_STAB
+      echo "---------------------------"
+      echo ""
+   fi
+     
+   #since the AutoplotVolatile filename doesnt have specific versioning, we need
+   #to do some extra managment to make sure wget is comparing the timestamp of
+   #the correct file
+   if [ -f "AutoplotVolatile.$AP_VER.jar.pack.gz" ]; then
+      cp --preserve=timestamps AutoplotVolatile.$AP_VER.jar.pack.gz AutoplotVolatile.jar.pack.gz
+   elif [ -f "AutoplotVolatile.jar.pack.gz" ]; then
+      rm  AutoplotVolatile.jar.pack.gz
+   fi 
+   echo "Updating AutolplotVolatile library..."
+   echo ""
+   wget -N http://autoplot.org/jnlp/$AP_VER/AutoplotVolatile.jar.pack.gz
+   unpack200 -v AutoplotVolatile.jar.pack.gz AutoplotVolatile.jar
+   echo "---------------------------"
+   echo ""
+   cp --preserve=timestamps AutoplotVolatile.jar.pack.gz AutoplotVolatile.$AP_VER.jar.pack.gz
 }
 
 #get any user supplied arguments
@@ -59,38 +99,9 @@ fi
 mkdir -p $AP_LIB
 mkdir -p $AP_LOG
 
-#download the webstart file which contains the version info
+#download the correct version of autoplot
 cd $AP_LIB
-echo ""
-echo "Updating Autoplot Webstart file..."
-echo ""
-wget -N http://autoplot.org/jnlp/$AP_VER/autoplot.jnlp
-echo "---------------------------"
-echo ""
-
-#get the AutoplotStable version and main class path from the webstart file
-MAINCLASS=$(grep main-class ~/autoplot_data/lib/autoplot.jnlp | sed -e 's/.*main-class="\(.*\)".*/\1/')
-AP_STAB=$(grep -oh "AutoplotStable.[[:digit:]]\{8\}.jar" autoplot.jnlp)
-
-#only download and upack AutoplotStable if we dont have it already
-if [ ! -f $AP_LIB/$AP_STAB ]; then
-   echo "Updating AutolplotStable library..."
-   echo ""
-   wget -N http://autoplot.org/jnlp/lib/$AP_STAB.pack.gz 
-   unpack200 -v $AP_STAB.pack.gz $AP_STAB
-   echo "---------------------------"
-   echo ""
-fi
-  
-#since AutoplotVolatile does not have a version number in the name,
-#just try to redownload and unpack
-echo "Updating AutolplotVolatile library..."
-echo ""
-wget -N http://autoplot.org/jnlp/$AP_VER/AutoplotVolatile.jar.pack.gz
-unpack200 -v AutoplotVolatile.jar.pack.gz AutoplotVolatile.jar
-echo "---------------------------"
-echo ""
-
+getjars
 cd -
 
 #Try to run java as specified by $JAVA_HOME. If that variable isn't set, just
