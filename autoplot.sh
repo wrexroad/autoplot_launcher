@@ -51,11 +51,16 @@ function getjars {
          exit
       fi
       
-      #We have to use gzip to decompress pack.gz file. Older versions of Java 
+      #We want to use gzip to decompress pack.gz file. Older versions of Java 
       #seem to be incompatable with some versions of unpack200 compression
-      gzip -d $AP_STAB.pack.gz
-      unpack200 -v $AP_STAB.pack $AP_STAB
-      rm $AP_STAB.pack
+      if hash gzip 2>/dev/null; then
+         gzip -d $AP_STAB.pack.gz
+         unpack200 -v $AP_STAB.pack $AP_STAB
+         rm $AP_STAB.pack
+      else
+         #no gzip? What kind of system is this? Oh well...
+         unpack200 -v $AP_STAB.pack.gz $AP_STAB
+      fi
       
       echo "---------------------------"
       echo ""
@@ -81,9 +86,13 @@ function getjars {
    #copy save the jar to a versioned filename for future use
    cp --preserve=timestamps AutoplotVolatile.jar.pack.gz AutoplotVolatile.$AP_VER.jar.pack.gz
    
-   gzip -d AutoplotVolatile.jar.pack.gz
-   unpack200 -v AutoplotVolatile.jar.pack AutoplotVolatile.jar
-   rm AutoplotVolatile.jar.pack
+   if hash gzip 2>/dev/null; then
+      gzip -d AutoplotVolatile.jar.pack.gz
+      unpack200 -v AutoplotVolatile.jar.pack AutoplotVolatile.jar
+      rm AutoplotVolatile.jar.pack
+   else
+      unpack200 -v AutoplotVolatile.jar.pack.gz AutoplotVolatile.jar
+   fi
    
    echo "---------------------------"
    echo ""
