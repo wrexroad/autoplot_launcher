@@ -10,9 +10,6 @@ memIsImplicit=1
 
 #get any user supplied arguments
 for i in "$@"; do
-   if [ "$APDEBUG" == "1" ]; then    
-       echo "arg: \"$i\""
-   fi
    if [[ $i == -J-Xmx* ]]; then
       JAVA_ARGS="${JAVA_ARGS} ${i:2}";
       memIsImplicit=0
@@ -24,10 +21,18 @@ for i in "$@"; do
       JAVA_ARGS="${JAVA_ARGS} -Djava.awt.headless=true";
    elif [[ $i == --version* ]]; then
       AP_VER="${i:10}";
+   elif [[ $i == "--debug" ]]; then
+      APDEBUG=1;
    else
       AP_ARGS="${AP_ARGS} $i";
    fi
 done
+
+if [ "$APDEBUG" == "1" ]; then    
+   for i in "$@"; do
+          echo "arg: \"$i\""
+   done
+fi
 
 #make sure there is a valid place to keep autoplot and log info
 mkdir -p $AP_LIB
