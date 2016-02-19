@@ -1,19 +1,44 @@
 #!/bin/bash
 
-#make sure there is a valid place to keep autoplot and log info
 AP_HOME=$HOME/autoplot_data
 AP_LIB=$AP_HOME/lib
 AP_LOG=$AP_HOME/log
+JAVA_ARGS=""
+AP_ARGS=""
+AP_VER="latest"
+memIsImplicit=1
+
+#get any user supplied arguments
+for i in "$@"; do
+   if [ "$APDEBUG" == "1" ]; then    
+       echo "arg: \"$i\""
+   fi
+   if [[ $i == -J-Xmx* ]]; then
+      JAVA_ARGS="${JAVA_ARGS} ${i:2}";
+      memIsImplicit=0
+   elif [[ $i == -J* ]]; then
+      JAVA_ARGS="${JAVA_ARGS} ${i:2}";
+   elif [[ $i == '--headless' ]]; then
+      JAVA_ARGS="${JAVA_ARGS} -Djava.awt.headless=true";
+   elif [[ $i == '-h' ]]; then
+      JAVA_ARGS="${JAVA_ARGS} -Djava.awt.headless=true";
+   elif [[ $i == --version* ]]; then
+      AP_VER="${i:10}";
+   else
+      AP_ARGS="${AP_ARGS} $i";
+   fi
+done
+
+#make sure there is a valid place to keep autoplot and log info
 mkdir -p $AP_LIB
 mkdir -p $AP_LOG
 
-cd $AP_LIB
-
 #download the webstart file which contains the version info
+cd $AP_LIB
 echo ""
 echo "Updating Autoplot Webstart file..."
 echo ""
-wget -N http://autoplot.org/autoplot.jnlp
+wget -N http://autoplot.org/jnlp/$AP_VER/autoplot.jnlp
 echo "---------------------------"
 echo ""
 
@@ -35,35 +60,12 @@ fi
 #just try to redownload and unpack
 echo "Updating AutolplotVolatile library..."
 echo ""
-wget -N http://autoplot.org/jnlp/latest/AutoplotVolatile.jar.pack.gz
+wget -N http://autoplot.org/jnlp/$AP_VER/AutoplotVolatile.jar.pack.gz
 unpack200 -v AutoplotVolatile.jar.pack.gz AutoplotVolatile.jar
 echo "---------------------------"
 echo ""
 
 cd -
-
-#get any user supplied arguments
-JAVA_ARGS=""
-AP_ARGS=""
-memIsImplicit=1
-
-for i in "$@"; do
-   if [ "$APDEBUG" == "1" ]; then    
-       echo "arg: \"$i\""
-   fi
-   if [[ $i == -J-Xmx* ]]; then
-      JAVA_ARGS="${JAVA_ARGS} ${i:2}";
-      memIsImplicit=0
-   elif [[ $i == -J* ]]; then
-      JAVA_ARGS="${JAVA_ARGS} ${i:2}";
-   elif [[ $i == '--headless' ]]; then
-      JAVA_ARGS="${JAVA_ARGS} -Djava.awt.headless=true";
-   elif [[ $i == '-h' ]]; then
-      JAVA_ARGS="${JAVA_ARGS} -Djava.awt.headless=true";
-   else
-      AP_ARGS="${AP_ARGS} $i";
-   fi
-done
 
 #Try to run java as specified by $JAVA_HOME. If that variable isn't set, just
 #use whatever java shows up first in $PATH 
